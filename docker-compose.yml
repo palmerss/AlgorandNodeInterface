@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+    node_mainnet:
+        profiles:
+            - mainnet
+        build:
+            context: .
+            dockerfile: node_mainnet.DockerFile
+        volumes:
+            - node_interface_shared_volume:/shared_volume/
+        tty: true
+        expose:
+            - "8080"
+        networks:
+            - default
+    node_testnet:
+        profiles:
+            - testnet
+        build:
+            context: .
+            dockerfile: node_testnet.DockerFile
+        volumes:
+            - node_interface_shared_volume:/shared_volume/
+        tty: true
+        expose:
+            - "8080"
+        networks:
+            - default
+    node_interface_server:
+        build:
+            context: .
+            dockerfile: node_interface_server.DockerFile
+        volumes:
+            - node_interface_shared_volume:/shared_volume/
+        tty: true
+        expose:
+            - "42069"
+        networks:
+            - default
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+            - node_interface_server
+        ports:
+            - "4000:4000"
+
+volumes:
+    node_interface_shared_volume:
+
+networks:
+    default:
+        driver: bridge
+        name: node_interface_network
