@@ -13,4 +13,3 @@ COPY ./start_algorand_node_testnet.sh /
 
 CMD /start_algorand_node_testnet.sh && \
    tail -f /dev/null
-

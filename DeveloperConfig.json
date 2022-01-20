@@ -1,4 +1,4 @@
 {
-  "algodAddress": "http://node_testnet:8080",
+  "algodAddress": "http://testnet:8080",
   "algodToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }

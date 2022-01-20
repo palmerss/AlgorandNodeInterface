@@ -3,7 +3,7 @@ import time
 import requests
 from algosdk.future import transaction
 from algosdk import mnemonic, encoding
-from IntefaceStatLogger import InterfaceStatLogger
+from InterfaceStatLogger import InterfaceStatLogger
 from multiprocessing import Process
 from algosdk.v2client import algod
 import json

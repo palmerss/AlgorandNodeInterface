@@ -1,55 +1,52 @@
 version: '3.8'
 services:
-    node_mainnet:
-        profiles:
-            - mainnet
+    algo_node_mainnet:
+        container_name: mainnet
+        profiles: [ "mainnet" ]
         build:
             context: .
-            dockerfile: node_mainnet.DockerFile
+            dockerfile: node_mainnet.Dockerfile
         volumes:
             - node_interface_shared_volume:/shared_volume/
+            - ./algo_conf/config.json:/root/node/data/config.json
+
+        stdin_open: true
         tty: true
-        expose:
+        ports:
             - "8080"
-        networks:
-            - default
-    node_testnet:
-        profiles:
-            - testnet
+    algo_node_testnet:
+        container_name: testnet
+        profiles: [ "testnet" ]
         build:
             context: .
-            dockerfile: node_testnet.DockerFile
+            dockerfile: node_testnet.Dockerfile
         volumes:
             - node_interface_shared_volume:/shared_volume/
+            - ./algo_conf/config.json:/root/node/data/config.json
+        stdin_open: true
         tty: true
-        expose:
+        ports:
             - "8080"
-        networks:
-            - default
-    node_interface_server:
+    interface_server:
+        container_name: interface_server
+        profiles: [ "testnet", "mainnet" ]
         build:
             context: .
-            dockerfile: node_interface_server.DockerFile
+            dockerfile: interface_server.Dockerfile
         volumes:
             - node_interface_shared_volume:/shared_volume/
+        stdin_open: true
         tty: true
-        expose:
+        ports:
             - "42069"
-        networks:
-            - default
     nginx:
+        container_name: nginx
+        profiles: [ "testnet", "mainnet" ]
         image: nginx:latest
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf:ro
-        depends_on:
-            - node_interface_server
         ports:
             - "4000:4000"
 
 volumes:
     node_interface_shared_volume:
-
-networks:
-    default:
-        driver: bridge
-        name: node_interface_network

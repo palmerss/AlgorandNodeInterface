@@ -6,10 +6,10 @@ import json
 
 #TODO we need akita_inu_asa_utils to be a submodule of both contracts repo and this repo
 from akita_inu_asa_utils import wait_for_txn_confirmation, get_asset_balance, get_algo_balance, read_global_state, read_local_state
-from IntefaceStatLogger import InterfaceStatLogger
+from InterfaceStatLogger import InterfaceStatLogger
 import base64
 
-class AlgorandNodeIntefaceBackend:
+class AlgorandNodeInterfaceBackend:
     def __init__(self):
         self.logger = InterfaceStatLogger("Algorand_Node_Interface")
         self.algod = self.get_client()

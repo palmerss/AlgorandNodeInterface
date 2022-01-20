@@ -11,4 +11,3 @@ RUN apt-get update && \
 COPY ./start_algorand_node_mainnet.sh /
 
 CMD /start_algorand_node_mainnet.sh && tail -f /dev/null
-
