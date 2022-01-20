@@ -6,7 +6,8 @@ RUN apt-get update && \
     python3-pip \
     vim \
     tmux \
-    wget
+    wget \
+    curl
 
 COPY ./start_algorand_node_testnet.sh /
 

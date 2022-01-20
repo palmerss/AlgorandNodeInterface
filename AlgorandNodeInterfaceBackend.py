@@ -143,4 +143,3 @@ class AlgorandNodeIntefaceBackend:
                 }
         return response
 
-    bb7b9b2e12026ad18d5bd2a0c5f2c25e437e479f5615b597b01645b1d6f63c98
