@@ -1,8 +1,11 @@
+import time
+
 from algosdk.v2client import algod
 from algosdk.future import transaction
 from algosdk import encoding, account, mnemonic
 from joblib import load
 import json
+import os
 
 #TODO we need akita_inu_asa_utils to be a submodule of both contracts repo and this repo
 from akita_inu_asa_utils import wait_for_txn_confirmation, get_asset_balance, get_algo_balance, read_global_state, read_local_state
@@ -119,14 +122,25 @@ class AlgorandNodeInterfaceBackend:
         return response
 
     def get_token_address(self, token_file='/shared_volume/algod.token'):
-        fp = open(token_file)
-        token = fp.readline()
-        return token, "http://node_interface_network:8080"
+        while True:
+            if os.path.exists(token_file):
+                fp = open(token_file)
+                token = fp.readline()
+                self.logger.log_info(f"Algorand Node Token: {token}")
+                return token, "http://algo_node_testnet:8080"
+            else:
+                time.sleep(1)
+                self.logger.log_info("Algorand Client Token not found... retrying")
+
+    def wait_for_client_to_idle(self, client):
+        while client.status()['catchpoint'] != '':
+            time.sleep(1)
 
     def get_client(self):
         token, address = self.get_token_address()
         client = algod.AlgodClient(token, address)
-        self.logger.log_info(client.status())
+        self.wait_for_client_to_idle(client)
+        self.logger.log_info("Algorand Client Has Started and is caught up")
         return client
 
     def load_schema(self, file_path):

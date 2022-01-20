@@ -1,4 +1,5 @@
 #!/bin/bash
+rm /shared_volume/algod.token
 cd /root/node/data
 rm ./genesis.json
 ln -s /root/node/genesisfiles/testnet/genesis.json ./genesis.json

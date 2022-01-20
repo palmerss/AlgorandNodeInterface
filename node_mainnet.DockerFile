@@ -8,6 +8,6 @@ RUN apt-get update && \
     tmux \
     wget
 
-COPY ./start_algorand_node_mainnet.sh /
+COPY start_algorand_node_mainnet.sh /
 
 CMD /start_algorand_node_mainnet.sh && tail -f /dev/null

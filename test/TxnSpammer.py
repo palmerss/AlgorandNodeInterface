@@ -2,7 +2,7 @@ import time
 
 import requests
 from algosdk.future import transaction
-from algosdk import mnemonic, encoding
+from algosdk import mnemonic, encoding, account
 from InterfaceStatLogger import InterfaceStatLogger
 from multiprocessing import Process
 from algosdk.v2client import algod
@@ -10,22 +10,15 @@ import json
 import logging
 
 logging.getLogger('tornado.access').disabled = True
-
-def get_token_address(file='./DeveloperConfig.json'):
-    fp = open(file)
-    file = json.load(fp)
-    return file['algodToken'], file['algodAddress']
-
-def get_client():
-    token, address = get_token_address()
-    return algod.AlgodClient(token, address)
+CLIENTTOKEN = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+CLIENTADDRESS = "http://localhost:4001"
+WALLETMNEMONIC = ""
 
 def spam_txns(group_size, logger, tps_limit=None, portnumber=42069):
     group_buffer = [None] * group_size
-    sender = ""
-    receiver = ""
-    client = get_client()
-    private_key = mnemonic.to_private_key("")
+    client = algod.AlgodClient(CLIENTTOKEN, CLIENTADDRESS)
+    private_key = mnemonic.to_private_key(WALLETMNEMONIC)
+    public_key = account.address_from_private_key(private_key)
     receiving_url = f"http://localhost:{portnumber}"
     interval = None
 
@@ -42,7 +35,7 @@ def spam_txns(group_size, logger, tps_limit=None, portnumber=42069):
             params = client.suggested_params()
             amount = 0
             for index in range(0, group_size):
-                group_buffer[index] = transaction.PaymentTxn(sender, params, receiver, amount, note=str(cycle_time))
+                group_buffer[index] = transaction.PaymentTxn(public_key, params, public_key, amount, note=str(cycle_time))
                 amount += 1
 
             group_buffer = transaction.assign_group_id(group_buffer)
@@ -58,6 +51,8 @@ def spam_txns(group_size, logger, tps_limit=None, portnumber=42069):
                            }
 
             response = requests.post(receiving_url, json.dumps(request_data))
+            if response.json()['STATUS'] != 'Transaction sent':
+                logger.log_info(response.json())
             logger.queue.put(group_size)
             cycle_time = time.time() - cycle_time
         except Exception as inst:

@@ -5,30 +5,29 @@ services:
         profiles: [ "mainnet" ]
         build:
             context: .
-            dockerfile: node_mainnet.Dockerfile
+            dockerfile: node_mainnet.DockerFile
         volumes:
             - node_interface_shared_volume:/shared_volume/
-            - ./algo_conf/config.json:/root/node/data/config.json
+            - ./config/config.json:/root/node/data/config.json
 
         stdin_open: true
         tty: true
-        ports:
+        expose:
             - "8080"
     algo_node_testnet:
         container_name: testnet
         profiles: [ "testnet" ]
         build:
             context: .
-            dockerfile: node_testnet.Dockerfile
+            dockerfile: node_testnet.DockerFile
         volumes:
             - node_interface_shared_volume:/shared_volume/
-            - ./algo_conf/config.json:/root/node/data/config.json
+            - ./config/config.json:/root/node/data/config.json
         stdin_open: true
         tty: true
-        ports:
+        expose:
             - "8080"
     interface_server:
-        container_name: interface_server
         profiles: [ "testnet", "mainnet" ]
         build:
             context: .
@@ -37,14 +36,14 @@ services:
             - node_interface_shared_volume:/shared_volume/
         stdin_open: true
         tty: true
-        ports:
+        expose:
             - "42069"
     nginx:
         container_name: nginx
         profiles: [ "testnet", "mainnet" ]
         image: nginx:latest
         volumes:
-            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
         ports:
             - "4000:4000"
 
