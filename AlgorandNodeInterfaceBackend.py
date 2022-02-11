@@ -56,6 +56,18 @@ class AlgorandNodeInterfaceBackend:
             return {"Error": f"Error getting asset balance: {inst.args}"}
         return response
 
+    def handle_get_txn_status(self, request):
+        try:
+            response = {}
+            txn_id = request['parameters']['txn_id']
+            pending_txn = self.algod.pending_transaction_info(txn_id)
+            if pending_txn.get("confirmed-round", 0) > 0:
+                response['txn_status'] = pending_txn
+            elif pending_txn["pool-error"]:
+                response = {"Error": "Error getting txn status due to algorand node pool error"}
+        except Exception as inst:
+                response =  {"Error": f"Error getting txn status: {inst.args}"}
+        return response
     
     def handle_get_user_asa_balance(self, request):
         try:
@@ -100,6 +112,9 @@ class AlgorandNodeInterfaceBackend:
         if request["testType"] in self.testing_handler_mapping.keys():
             return self.testing_handler_mapping[request["testType"]](request)
 
+    def ping(self, request):
+        return {"STATUS": "PONG"}
+
     def handle_send_to_algo_node_request(self, request):
         try:
             txn_id = self.send_raw_transactions(request['transactions'])
@@ -122,6 +137,7 @@ class AlgorandNodeInterfaceBackend:
         return response
 
     def get_token(self, token_file='/shared_volume/algod.token'):
+        time.sleep(10) #hacky work around for slow machines...
         while True:
             if os.path.exists(token_file):
                 fp = open(token_file)
@@ -148,8 +164,12 @@ class AlgorandNodeInterfaceBackend:
         try:
             client = self.establishClient(address)
         except:
-            address = "http://algo_node_mainnet:8080"
-            client = self.establishClient(address)
+            try:
+                address = "http://algo_node_mainnet:8080"
+                client = self.establishClient(address)
+            except:
+                print("Connection to Algorand Client could not be established")
+                exit()
 
         self.logger.log_info("Algorand Client Has Started and is caught up")
         return client
