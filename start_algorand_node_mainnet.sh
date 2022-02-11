@@ -6,4 +6,4 @@ ln -s /root/node/genesisfiles/mainnet/genesis.json ./genesis.json
 cd ..
 ./update.sh -d ./data/
 cp ./data/algod.token /shared_volume/
-./goal node -d ./data/ catchup "`wget -qO- https://algorand-catchpoints.s5.us-east-2.amazonaws.com/channel/mainnet/latest.catchpoint`"
+./goal node -d ./data/ catchup "`wget -qO- https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/mainnet/latest.catchpoint`"
