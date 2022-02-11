@@ -12,7 +12,7 @@ import logging
 logging.getLogger('tornado.access').disabled = True
 CLIENTTOKEN = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 CLIENTADDRESS = "http://localhost:4001"
-WALLETMNEMONIC = ""
+WALLETMNEMONIC = "jar over grace body leg math wait buddy slogan canyon frame moral enemy congress zebra upon high actual glory arm rifle spot rare abstract century"
 
 def spam_txns(group_size, logger, tps_limit=None, portnumber=42069):
     group_buffer = [None] * group_size

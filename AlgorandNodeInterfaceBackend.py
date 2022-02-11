@@ -121,13 +121,13 @@ class AlgorandNodeInterfaceBackend:
             return errormsg
         return response
 
-    def get_token_address(self, token_file='/shared_volume/algod.token'):
+    def get_token(self, token_file='/shared_volume/algod.token'):
         while True:
             if os.path.exists(token_file):
                 fp = open(token_file)
                 token = fp.readline()
                 self.logger.log_info(f"Algorand Node Token: {token}")
-                return token, "http://algo_node_testnet:8080"
+                return token
             else:
                 time.sleep(1)
                 self.logger.log_info("Algorand Client Token not found... retrying")
@@ -136,10 +136,21 @@ class AlgorandNodeInterfaceBackend:
         while client.status()['catchpoint'] != '':
             time.sleep(1)
 
-    def get_client(self):
-        token, address = self.get_token_address()
+    def establishClient(self, address):
+        token = self.get_token()
         client = algod.AlgodClient(token, address)
         self.wait_for_client_to_idle(client)
+        return client
+
+    #try testnet first and then main net #TODO I need to handle address the same way as token to clean this up
+    def get_client(self):
+        address = "http://algo_node_testnet:8080"
+        try:
+            client = self.establishClient(address)
+        except:
+            address = "http://algo_node_mainnet:8080"
+            client = self.establishClient(address)
+
         self.logger.log_info("Algorand Client Has Started and is caught up")
         return client
 
