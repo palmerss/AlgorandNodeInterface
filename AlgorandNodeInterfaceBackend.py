@@ -8,7 +8,7 @@ import json
 import os
 
 #TODO we need akita_inu_asa_utils to be a submodule of both contracts repo and this repo
-from akita_inu_asa_utils import wait_for_txn_confirmation, get_asset_balance, get_algo_balance, read_global_state, read_local_state
+from akita_inu_asa_utils import wait_for_txn_confirmation, get_asset_balance, get_algo_balance, get_translated_local_state, get_translated_global_state
 from InterfaceStatLogger import InterfaceStatLogger
 import base64
 
@@ -43,17 +43,19 @@ class AlgorandNodeInterfaceBackend:
 
     def handle_get_state(self, request):
         try:
-            creator_key = request["creatorPublicKey"]
-            user_key = request["userPublicKey"]
+            local_state = None
             pool_id = request["parameters"]["pool_id"]
-            global_state = read_global_state(self.algod, creator_key, pool_id)
-            local_state = read_local_state(self.algod, user_key, pool_id)
+
+            global_state = get_translated_global_state(self.algod, pool_id)
+            if 'userPublicKey' in request.keys():
+                local_state = get_translated_local_state(self.algod, pool_id, request["userPublicKey"])
+
             response = {
                         "local_state": local_state,
                         "global_state": global_state
                     }
         except Exception as inst:
-            return {"Error": f"Error getting asset balance: {inst.args}"}
+            return {"Error": f"Error getting state: {inst.args}"}
         return response
 
     def handle_get_txn_status(self, request):
