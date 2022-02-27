@@ -12,19 +12,30 @@ from akita_inu_asa_utils import wait_for_txn_confirmation, get_asset_balance, ge
 from InterfaceStatLogger import InterfaceStatLogger
 import base64
 
+TEST_TOKENS_DRIP_RATE = 5000000
 class AlgorandNodeInterfaceBackend:
     def __init__(self):
         self.logger = InterfaceStatLogger("Algorand_Node_Interface")
         self.algod = self.get_client()
-
+        self.test_wallet = self.load_test_wallet()
 
         self.transaction_handler_mapping ={
                
                 }
 
         self.testing_handler_mapping = {
-            "generate_test_wallet": self.generate_test_wallet
+
         }
+    
+    def load_test_wallet(self):
+        fp = open("./testWallet")
+        test_mnemonic = fp.readline()
+        pk = mnemonic.to_private_key(test_mnemonic)
+        sk = mnemonic.to_public_key(test_mnemonic)
+        return {"mnemonic": test_mnemonic,
+                "public_key": pk,
+                "private_key": sk}
+
     
     def load_json(self, file_path):
         fp = open(file_path)
@@ -40,6 +51,21 @@ class AlgorandNodeInterfaceBackend:
         return self.algod.send_raw_transaction(
             base64.b64encode(b"".join(serialized)), **kwargs
         )
+
+    def handle_get_test_token(self, request):
+        try:
+            token_to_request = request["parameters"]["token_id"]
+            user_to_receive = request["userPublicKey"]
+            txn = transaction.AssetTransferTxn(self.test_wallet['public_key'], 
+                                                self.algod.suggested_params(),
+                                                user_to_receive,
+                                                TEST_TOKENS_DRIP_RATE,
+                                                token_to_request)
+            txn = txn.sign(self.test_wallet['private_key'])
+            self.algod.send_transactions([txn])
+            return {"STATUS": "Test tokens dispensed"}
+        except Exception as inst:
+            return {"ERROR": f"Error dispensing test tokens: {inst.args}"}
 
     def handle_get_state(self, request):
         try:
@@ -110,10 +136,6 @@ class AlgorandNodeInterfaceBackend:
         if request["transactionType"] in self.transaction_handler_mapping.keys():
             return self.transaction_handler_mapping[request["transactionType"]](request)
 
-    def handle_testing_request(self, request):
-        if request["testType"] in self.testing_handler_mapping.keys():
-            return self.testing_handler_mapping[request["testType"]](request)
-
     def ping(self, request):
         return {"STATUS": "PONG"}
 
@@ -181,12 +203,4 @@ class AlgorandNodeInterfaceBackend:
         stateJSON = json.load(f)
         return transaction.StateSchema(stateJSON['num_ints'], stateJSON['num_bytes'])
 
-    def generate_test_wallet(self, request):
-        private_key, address = account.generate_account()
-        response = {
-                    "mnemonic": mnemonic.from_private_key(private_key),
-                    "private_key": private_key,
-                    "public_key": address
-                }
-        return response
-
+    def 
