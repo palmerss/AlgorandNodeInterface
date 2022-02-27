@@ -202,5 +202,3 @@ class AlgorandNodeInterfaceBackend:
         f = open(file_path, 'r')
         stateJSON = json.load(f)
         return transaction.StateSchema(stateJSON['num_ints'], stateJSON['num_bytes'])
-
-    def 
