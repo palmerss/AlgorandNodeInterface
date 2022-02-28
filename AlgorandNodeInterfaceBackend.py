@@ -30,8 +30,8 @@ class AlgorandNodeInterfaceBackend:
     def load_test_wallet(self):
         fp = open("./testWallet")
         test_mnemonic = fp.readline()
-        pk = mnemonic.to_private_key(test_mnemonic)
-        sk = mnemonic.to_public_key(test_mnemonic)
+        pk = mnemonic.to_public_key(test_mnemonic)
+        sk = mnemonic.to_private_key(test_mnemonic)
         return {"mnemonic": test_mnemonic,
                 "public_key": pk,
                 "private_key": sk}
