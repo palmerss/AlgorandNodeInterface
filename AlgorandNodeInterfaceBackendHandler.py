@@ -16,7 +16,6 @@ class AlgorandNodeInterfaceBackendHandler(tornado.web.RequestHandler):
                 "get_user_asa_algo_balance": backend.handle_get_user_asa_algo_balance,
                 "get_test_token": backend.handle_get_test_token,
                 "get_state": backend.handle_get_state,
-                "testing": backend.handle_testing_request,
                 "ping": backend.ping,
         }
 
