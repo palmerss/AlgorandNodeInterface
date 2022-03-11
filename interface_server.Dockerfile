@@ -9,11 +9,11 @@ RUN apt-get update && \
     wget \
     curl
 
-RUN mkdir /AkitaAlgorandNodeInterface
+RUN mkdir /AlgorandNodeInterface
 
-ADD . /AkitaAlgorandNodeInterface/
+ADD . /AlgorandNodeInterface/
 
-CMD pip install -r /AkitaAlgorandNodeInterface/requirements.txt && \
-    cd /AkitaAlgorandNodeInterface/ && \
-    python3 /AkitaAlgorandNodeInterface/main.py && \
+CMD pip install -r /AlgorandNodeInterface/requirements.txt && \
+    cd /AlgorandNodeInterface/ && \
+    python3 /AlgorandNodeInterface/main.py && \
     tail -f /dev/null
